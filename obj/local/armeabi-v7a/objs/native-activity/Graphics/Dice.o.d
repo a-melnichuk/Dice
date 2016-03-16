@@ -209,8 +209,9 @@ obj/local/armeabi-v7a/objs/native-activity/Graphics/Dice.o: \
  /home/al/Android/android-ndk-r10e/platforms/android-9/arch-arm/usr/include/machine/setjmp.h \
  /home/al/Android/android-ndk-r10e/sources/libpng/pngconf.h \
  jni/Graphics/../Logs.h jni/Graphics/Resource.h jni/Graphics/CubeMap.h \
- jni/Camera.h jni/Graphics/../Physics/RigidBody.h \
- jni/Graphics/../Physics/../Logs.h jni/dice.inl
+ jni/Camera.h jni/Graphics/ShadowMap.h \
+ jni/Graphics/../Physics/RigidBody.h jni/Graphics/../Physics/../Logs.h \
+ jni/dice.inl
 
 jni/Graphics/Dice.h:
 
@@ -641,6 +642,8 @@ jni/Graphics/Resource.h:
 jni/Graphics/CubeMap.h:
 
 jni/Camera.h:
+
+jni/Graphics/ShadowMap.h:
 
 jni/Graphics/../Physics/RigidBody.h:
 

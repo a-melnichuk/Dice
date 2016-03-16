@@ -216,7 +216,7 @@ obj/local/armeabi/objs/native-activity/Main.o: jni/Main.cpp jni/Engine.h \
  jni/Physics/../Logs.h jni/Physics/Cube.h jni/Physics/Primitive.h \
  jni/Physics/Cylinder.h jni/Physics/Plane.h jni/Physics/Ray.h \
  jni/Physics/Contact.h jni/Graphics/Dice.h jni/Graphics/Shape.h \
- jni/Graphics/TextureManager.h jni/Camera.h \
+ jni/Graphics/TextureManager.h jni/Camera.h jni/Graphics/ShadowMap.h \
  jni/Graphics/../Physics/RigidBody.h jni/Graphics/Container.h \
  /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/algorithm \
  /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/stl/_algo.h \
@@ -225,7 +225,8 @@ obj/local/armeabi/objs/native-activity/Main.o: jni/Main.cpp jni/Engine.h \
  /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/stl/_algo.c \
  /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/stl/_tempbuf.h \
  /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/stl/_tempbuf.c \
- jni/Camera.h
+ jni/Graphics/ShadowMap.h jni/Camera.h jni/Graphics/Quad.h \
+ jni/Graphics/../Camera.h
 
 jni/Engine.h:
 
@@ -687,6 +688,8 @@ jni/Graphics/TextureManager.h:
 
 jni/Camera.h:
 
+jni/Graphics/ShadowMap.h:
+
 jni/Graphics/../Physics/RigidBody.h:
 
 jni/Graphics/Container.h:
@@ -705,4 +708,10 @@ jni/Graphics/Container.h:
 
 /home/al/Android/android-ndk-r10e/sources/cxx-stl/stlport/stlport/stl/_tempbuf.c:
 
+jni/Graphics/ShadowMap.h:
+
 jni/Camera.h:
+
+jni/Graphics/Quad.h:
+
+jni/Graphics/../Camera.h:

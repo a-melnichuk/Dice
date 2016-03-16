@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 #include "Shape.h"
+#include "ShadowMap.h"
 
 class Container : public Shape<Container>
 {
@@ -19,7 +20,8 @@ public:
 				float height,
 				uint32_t numSlices, uint32_t numStacks);
 	void update(float dt);
-	void draw();
+	void draw(ShadowMap& shadowMap);
+	void drawToShadowMap(ShadowMap& shadowMap);
 	void unload();
 
 private:
@@ -35,7 +37,7 @@ private:
 	};
 
 	enum SHADER_ATTR { ATTR_VERTEX, ATTR_NORMAL, ATTR_TEXTURE };
-	struct ShaderParams { GLuint program, MVP, lightColor, eyePos, sampler; };
+	struct ShaderParams { GLuint program, MVP, M, lightViewProj, lightColor, eyePos, sampler, lightSampler; };
 
 	void initBuffers(Vertex* verticesArr, short* indicesArr);
 	void initTextures();

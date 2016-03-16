@@ -14,8 +14,10 @@
 #include "Physics/CollisionManager.h"
 #include "Graphics/Dice.h"
 #include "Graphics/Container.h"
+#include "Graphics/ShadowMap.h"
 #include "Camera.h"
 #include "NDKHelper.h"
+#include "Graphics/Quad.h"
 
 class Engine
 {
@@ -46,7 +48,9 @@ public:
 private:
     Dice mDice;
     Container mContainer;
+    ShadowMap mShadowMap;
     Timer mTimer;
+    Quad mQuad;
     Camera mCamera;
     TextureManager mTextureManager;
     CollisionManager mCollisionManager;

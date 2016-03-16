@@ -2,6 +2,7 @@
 #define _DICE_DICE_
 
 #include "Shape.h"
+#include "ShadowMap.h"
 #include "../Physics/RigidBody.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -12,7 +13,8 @@ public:
     Dice(Camera& camera, TextureManager& textureManager);
     ~Dice();
     void init(RigidBody* rigidBody, ndk_helper::Vec3& halfSize);
-    void draw();
+    void draw(ShadowMap& shadowMap);
+    void drawToShadowMap(ShadowMap& shadowMap);
     void update( float dt );
     void unload();
     RigidBody* mRigidBody;

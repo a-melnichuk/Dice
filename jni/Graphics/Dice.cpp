@@ -24,6 +24,8 @@ void Dice::init(RigidBody *rigidBody, ndk_helper::Vec3& halfSize)
     mRigidBody = rigidBody;
     mInitial = ndk_helper::Mat4::Identity();
     mInitial.SetDiagonal(mHalfSize);
+
+    mM = mInitial;
 }
 
 
@@ -33,12 +35,43 @@ void Dice::update( float dt )
 	mMVP = mCamera.mViewProj * mM;
 }
 
-void Dice::draw()
+void Dice::drawToShadowMap(ShadowMap& shadowMap)
 {
+	glUseProgram( shadowMap.mShaderParams.program );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo );
+	glBindBuffer( GL_ARRAY_BUFFER, mVbo );
+
+	glVertexAttribPointer( shadowMap.ATTR_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET( 0 ) );
+	glEnableVertexAttribArray( shadowMap.ATTR_VERTEX );
 
 
-    // Bind the VBO
+	glUniformMatrix4fv( shadowMap.mShaderParams.VP, 1, GL_FALSE, shadowMap.mLightViewProj.Ptr() );
+	glUniformMatrix4fv( shadowMap.mShaderParams.M, 1, GL_FALSE, mM.Ptr() );
+	glDrawElements( GL_TRIANGLES, mNumIdices, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0) );
+	glDisableVertexAttribArray( shadowMap.ATTR_VERTEX );
+}
+
+void Dice::draw(ShadowMap& shadowMap)
+{
+	glUseProgram( mShaderParams.program );
+
+    mTexture->apply();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, shadowMap.mDepthMap);
+
+
+    ndk_helper::Vec3 lightColor(0.5f,0.5f,0.5f);
+
+    glUniform1i(mShaderParams.sampler, 0);
+    glUniform3f( mShaderParams.eyePos, mCamera.mPos.x_, mCamera.mPos.y_, mCamera.mPos.z_ );
+    glUniform3f( mShaderParams.lightColor, lightColor.x_, lightColor.y_, lightColor.z_ );
+    glUniformMatrix4fv( mShaderParams.MVP, 1, GL_FALSE, mMVP.Ptr() );
+    glUniformMatrix4fv( mShaderParams.M, 1, GL_FALSE, mM.Ptr() );
+
+	// Bind the VBO
     glBindBuffer( GL_ARRAY_BUFFER, mVbo );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo );
 
     int32_t iStride = sizeof(Vertex);
     // Pass the vertex data
@@ -50,26 +83,13 @@ void Dice::draw()
             BUFFER_OFFSET( 3 * sizeof(GLfloat) ) );
     glEnableVertexAttribArray( ATTR_NORMAL );
 
-
-    // Bind the IB
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo );
-
-    glUseProgram( mShaderParams.program );
-
-    mTexture->apply();
-
-    ndk_helper::Vec3 lightColor(0.5f,0.5f,0.5f);
-
-    glUniform1i(mShaderParams.sampler, 0);
-    glUniform3f( mShaderParams.eyePos, mCamera.mPos.x_, mCamera.mPos.y_, mCamera.mPos.z_ );
-    glUniform3f( mShaderParams.lightColor, lightColor.x_, lightColor.y_, lightColor.z_ );
-    glUniformMatrix4fv( mShaderParams.MVP, 1, GL_FALSE, mMVP.Ptr() );
-    glUniformMatrix4fv( mShaderParams.M, 1, GL_FALSE, mM.Ptr() );
-
     glDrawElements( GL_TRIANGLES, mNumIdices, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0) );
 
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glDisableVertexAttribArray(ATTR_VERTEX);
+    glDisableVertexAttribArray(ATTR_NORMAL);
+
+   // glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    //glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
 void Dice::bindShaderAttributes(GLuint program)
@@ -129,8 +149,8 @@ void Dice::initBuffers()
 void Dice::initTextures()
 {
 	mTexture = mTextureManager.registerCubeMap("dice/d1.png","dice/d6.png",
-											 "dice/d3.png","dice/d4.png",
-											 "dice/d5.png","dice/d2.png");
+											   "dice/d3.png","dice/d4.png",
+											   "dice/d5.png","dice/d2.png");
 	mTexture->load();
 }
 

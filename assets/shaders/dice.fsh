@@ -9,6 +9,7 @@ varying vec3 v_PosM;
 varying vec3 v_Normal;
 
 void main() {
+
 	vec3 color = textureCube(u_TextureUnit, v_PosM).rgb;
 
 	vec3 lightPos = u_EyePos;
@@ -19,8 +20,8 @@ void main() {
 	
 	vec3 viewDir = normalize(u_EyePos - v_PosW);
 	
-	vec3 reflectDir = reflect(-lightDir, v_Normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 2.0); 
+	vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(v_Normal, halfwayDir), 0.0), 2.0);
 
-	gl_FragColor = vec4( (ambient + diff) * color  +  spec * u_LightColor, 1.0);
+	gl_FragColor = vec4( ambient * color + ( (diff  +  spec) * u_LightColor * color )  , 1.0);
 }

@@ -32,6 +32,10 @@ public:
 	ndk_helper::Vec3 mAccelerationA, mPrevAccelerationA;
 	ndk_helper::Quaternion mOrientation;
 	ndk_helper::Mat4 mModel;
+	ndk_helper::Vec3 mVelocityLAccumulator, mPrevVelocityLAccumulator,
+					mVelocityAAccumulator, mPrevVelocityAAccumulator;
+
+
 	ndk_helper::Mat3 mInverseInertiaTensor, mInverseInertiaTensorW;
 private:
 };

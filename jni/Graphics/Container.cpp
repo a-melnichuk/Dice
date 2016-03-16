@@ -70,7 +70,8 @@ void Container::init(float topRadius, float bottomRadius, float height,
 	delete[] verticesArr;
 	delete[] indicesArr;
 
-	//mM = ndk_helper::Mat4::Identity();
+	mM = ndk_helper::Mat4::Identity();
+	//mM = ndk_helper::Mat4::Translation(0.0f,0.0f,-1.5f);
 }
 
 void Container::update(float dt)
@@ -78,45 +79,69 @@ void Container::update(float dt)
 
 }
 
-void Container::draw()
-{
 
-    ndk_helper::Mat4 MVP = mCamera.mViewProj;// * mM;
+void Container::drawToShadowMap(ShadowMap& shadowMap)
+{
+	glUseProgram( shadowMap.mShaderParams.program );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo );
+	glBindBuffer( GL_ARRAY_BUFFER, mVbo );
+	glVertexAttribPointer( shadowMap.ATTR_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET( 0 ) );
+	glEnableVertexAttribArray( shadowMap.ATTR_VERTEX );
+
+	glUniformMatrix4fv( shadowMap.mShaderParams.VP, 1, GL_FALSE, shadowMap.mLightViewProj.Ptr() );
+	glUniformMatrix4fv( shadowMap.mShaderParams.M, 1, GL_FALSE, mM.Ptr() );
+	glDrawElements( GL_TRIANGLES, mNumFaces * 3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0) );
+	glDisableVertexAttribArray( shadowMap.ATTR_VERTEX );
+	checkGlError("b");
+}
+
+void Container::draw(ShadowMap& shadowMap)
+{
+	glUseProgram( mShaderParams.program );
+    ndk_helper::Mat4 MVP = mCamera.mViewProj * mM;
     glDisable( GL_CULL_FACE );
     // Bind the VBO
     glBindBuffer( GL_ARRAY_BUFFER, mVbo );
-
-    int32_t iStride = sizeof(Vertex);
-    // Pass the vertex data
-    glVertexAttribPointer( ATTR_VERTEX, 3, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 0 ) );
-    glEnableVertexAttribArray( ATTR_VERTEX );
-
-    glVertexAttribPointer( ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 3 * sizeof(GLfloat) ) );
-    glEnableVertexAttribArray( ATTR_NORMAL );
-
-    glVertexAttribPointer( ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 6 * sizeof(GLfloat) ) );
-    glEnableVertexAttribArray( ATTR_TEXTURE );
-
-
-    // Bind the IB
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo );
 
-    glUseProgram( mShaderParams.program );
-
     mTexture->apply();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, shadowMap.mDepthMap);
+
 
     ndk_helper::Vec3 lightColor(0.1f,0.1f,0.1f);
 
     glUniform1i(mShaderParams.sampler, 0);
+    glUniform1i(mShaderParams.lightSampler, 1);
     glUniform3f( mShaderParams.eyePos, mCamera.mPos.x_, mCamera.mPos.y_, mCamera.mPos.z_ );
     glUniform3f( mShaderParams.lightColor, lightColor.x_, lightColor.y_, lightColor.z_ );
+    glUniformMatrix4fv( mShaderParams.lightViewProj, 1, GL_FALSE, shadowMap.mLightViewProj.Ptr() );
     glUniformMatrix4fv( mShaderParams.MVP, 1, GL_FALSE, MVP.Ptr() );
+    glUniformMatrix4fv( mShaderParams.M, 1, GL_FALSE, mM.Ptr() );
+
+    int32_t iStride = sizeof(Vertex);
+       // Pass the vertex data
+   glVertexAttribPointer( ATTR_VERTEX, 3, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 0 ) );
+   glEnableVertexAttribArray( ATTR_VERTEX );
+
+   glVertexAttribPointer( ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 3 * sizeof(GLfloat) ) );
+   glEnableVertexAttribArray( ATTR_NORMAL );
+
+   glVertexAttribPointer( ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, iStride, BUFFER_OFFSET( 6 * sizeof(GLfloat) ) );
+   glEnableVertexAttribArray( ATTR_TEXTURE );
 
     glDrawElements( GL_TRIANGLES, 3*mNumFaces, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0) );
 
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glDisableVertexAttribArray(ATTR_VERTEX);
+    glDisableVertexAttribArray(ATTR_NORMAL);
+    glDisableVertexAttribArray(ATTR_TEXTURE);
+
+   // glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    //glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     glEnable( GL_CULL_FACE );
+    checkGlError("c");
 }
 
 void Container::buildStacks(std::vector<Vertex>& vertices, std::vector<short>& indices)
@@ -256,9 +281,12 @@ void Container::initShaders()
 {
 	mShaderParams.program = loadShaders( "shaders/container.vsh", "shaders/container.fsh" );
 	mShaderParams.MVP = glGetUniformLocation( mShaderParams.program, "u_MVPMatrix" );
+	mShaderParams.M = glGetUniformLocation( mShaderParams.program, "u_ModelMatrix" );
+	mShaderParams.lightViewProj = glGetUniformLocation( mShaderParams.program, "u_LightVPMatrix" );
 	mShaderParams.lightColor = glGetUniformLocation( mShaderParams.program, "u_LightColor" );
 	mShaderParams.eyePos = glGetUniformLocation( mShaderParams.program, "u_EyePos" );
 	mShaderParams.sampler = glGetUniformLocation( mShaderParams.program, "u_TextureUnit" );
+	mShaderParams.lightSampler = glGetUniformLocation( mShaderParams.program, "u_ShadowMapTex" );
 }
 
 void Container::initTextures()

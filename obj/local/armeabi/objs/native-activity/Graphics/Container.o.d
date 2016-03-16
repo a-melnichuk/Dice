@@ -217,7 +217,7 @@ obj/local/armeabi/objs/native-activity/Graphics/Container.o: \
  /home/al/Android/android-ndk-r10e/platforms/android-9/arch-arm/usr/include/machine/setjmp.h \
  /home/al/Android/android-ndk-r10e/sources/libpng/pngconf.h \
  jni/Graphics/../Logs.h jni/Graphics/Resource.h jni/Graphics/CubeMap.h \
- jni/Camera.h
+ jni/Camera.h jni/Graphics/ShadowMap.h
 
 jni/Graphics/Container.h:
 
@@ -662,3 +662,5 @@ jni/Graphics/Resource.h:
 jni/Graphics/CubeMap.h:
 
 jni/Camera.h:
+
+jni/Graphics/ShadowMap.h:

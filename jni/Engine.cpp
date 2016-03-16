@@ -52,6 +52,10 @@ void Engine::loadResources()
     mCollisionManager.add(new Cylinder(topRadius, height));
 
     mContainer.init(topRadius, bottomRadius, height, 25, 15);
+    ndk_helper::Vec3 lookAt(0.0f,-0.1f,0.0f);
+    ndk_helper::Vec3 pos(-0.9f,0.0f,0.9f);
+    mShadowMap.init(pos, lookAt ,mCamera);
+    mQuad.init();
 }
 
 /**
@@ -63,6 +67,7 @@ void Engine::unloadResources()
 	mContainer.unload();
 	mTextureManager.unloadResources();
 	mCollisionManager.unload();
+	mQuad.unload();
 }
 
 /**
@@ -109,7 +114,6 @@ int Engine::initDisplay()
  */
 void Engine::drawFrame()
 {
-	LOGI("HELLO");
 	if(!mHasFocus) return;
 	float dt = mTimer.tick();
 
@@ -117,12 +121,25 @@ void Engine::drawFrame()
 	mContainer.update(dt);
     mDice.update( dt );
 
+    glViewport(0, 0, mShadowMap.SHADOW_WIDTH, mShadowMap.SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowMap.mDepthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glCullFace(GL_FRONT);
+
+    mDice.drawToShadowMap(mShadowMap);
+    mContainer.drawToShadowMap(mShadowMap);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCullFace(GL_BACK);
+    glViewport(0, 0, mScreenWidth, mScreenHeight);
+
     // Just fill the screen with a color.
     glClearColor( 0.5f, 0.5f, 0.5f, 1.f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    mContainer.draw();
-    mDice.draw();
+    mDice.draw(mShadowMap);
+    mContainer.draw(mShadowMap);
+    mQuad.draw(mShadowMap);
 
     // Swap
     if( EGL_SUCCESS != mGlContext->Swap() )
@@ -267,6 +284,9 @@ void Engine::setState( android_app* state )
     mTextureManager.init(mApp);
     mDice.setAssetManager(mApp->activity->assetManager);
     mContainer.setAssetManager(mApp->activity->assetManager);
+    mShadowMap.setAssetManager(mApp->activity->assetManager);
+    mQuad.setAssetManager(mApp->activity->assetManager);
+
 }
 
 bool Engine::isReady()
