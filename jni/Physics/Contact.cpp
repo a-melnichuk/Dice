@@ -65,7 +65,7 @@ void Contact::applyVelocityChange(ndk_helper::Vec3& velocityChange,
 
     ndk_helper::Vec3 origin(0.0f,0.0f,0.0f);
     velocityChange = origin;
-    velocityChange += impulse * 1.0f/mBody->mMass;
+    velocityChange += impulse * mBody->mInverseMass;
 
     mBody->mVelocityL += velocityChange;
     mBody->mVelocityA += mBody->mDampingA * rotationChange;

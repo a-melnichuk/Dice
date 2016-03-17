@@ -22,7 +22,7 @@ float Timer::tick()
     mElapsedTotal = timePassed - mFirstTime;
     mPrevTime = timePassed;
 
-    LOGI("time passed: %f prev: %f passed: %f dt: %f",timePassed, mPrevTime, mPausedTime, dt);
+  //  LOGI("time passed: %f prev: %f passed: %f dt: %f",timePassed, mPrevTime, mPausedTime, dt);
 
     return dt < 0 ? 0 : dt;
 }

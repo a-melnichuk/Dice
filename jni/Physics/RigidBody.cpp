@@ -7,15 +7,32 @@ mMass(1.0f), mRestitution(1.0f), mFriction(1.0f), mDampingL(1.0f), mDampingA(1.0
 }
 
 RigidBody::RigidBody(ndk_helper::Vec3 pos, float mass, float friction, float restitution, float dampingL, float dampingA):
-mPos(pos), mMass(mass), mRestitution(restitution), mFriction(friction), mDampingL(dampingL), mDampingA(dampingA)
+mPos(pos), mMass(mass), mRestitution(restitution), mFriction(friction), mDampingL(dampingL), mDampingA(dampingA),
+mAverageAngMotion(1.0f)
 {
 	mInverseMass = 1.0f/mMass;
 }
 
 void RigidBody::intergrate(float dt, ndk_helper::Vec3& acceleration )
 {
+
+	float angMotion = mVelocityA.Dot(mVelocityA);
+	float linMotion = mVelocityL.Dot(mVelocityL);
+
+	float weightCoeff = pow(0.4f,dt);
+	float stableAngMotion = weightCoeff*mAverageAngMotion + (1.0f-weightCoeff)*angMotion;
+
 	mPrevAccelerationL = mAccelerationL;
-	ndk_helper::Vec3 accDiff = acceleration - mPrevAccelerationL;
+
+	if(stableAngMotion < 0.01f)
+		mOrientation = mPrevOrientation;
+	else
+		mPrevOrientation = mOrientation;
+
+	if(linMotion < 0.005f)
+		mPos = mPrevPos;
+	else
+		mPrevPos = mPos;
 
 	mAccelerationL = acceleration;
 
@@ -33,6 +50,9 @@ void RigidBody::intergrate(float dt, ndk_helper::Vec3& acceleration )
 	mOrientation += orientation;
 
 	updateModel();
+
+	mAverageAngMotion = 0.8f * mAverageAngMotion + 0.2f*angMotion;
+	mAverageAngMotion *= 0.2f;
 }
 
 void RigidBody::updateModel()

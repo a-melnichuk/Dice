@@ -25,8 +25,6 @@ void CollisionManager::update(float dt)
 	updatePositions(dt);
 	updateVelocities(dt);
 	mContacts.clear();
-
-
 }
 
 void CollisionManager::updateRigidBodies(float dt, ndk_helper::Vec3& acceleration)
@@ -217,7 +215,6 @@ void CollisionManager::resolveCylinderCube(Cylinder& cylinder, Cube& cube)
 
 		if( (vertexPosW - center).SquaredLength() > r2 )
 		{
-
 			mContacts.push_back(Contact());
 			Contact& contact = mContacts[mContacts.size() - 1];
 
@@ -227,7 +224,6 @@ void CollisionManager::resolveCylinderCube(Cylinder& cylinder, Cube& cube)
 
 			contact.mNormal.Normalize();
 			contact.mPoint = contact.mPenetration * contact.mNormal + vertexPosW;
-
 		}
 	}
 }

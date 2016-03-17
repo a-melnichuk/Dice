@@ -133,13 +133,12 @@ void Engine::drawFrame()
     glCullFace(GL_BACK);
     glViewport(0, 0, mScreenWidth, mScreenHeight);
 
-    // Just fill the screen with a color.
     glClearColor( 0.5f, 0.5f, 0.5f, 1.f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     mDice.draw(mShadowMap);
     mContainer.draw(mShadowMap);
-    mQuad.draw(mShadowMap);
+    //mQuad.draw(mShadowMap); // debug quad from shadow maps perspective
 
     // Swap
     if( EGL_SUCCESS != mGlContext->Swap() )

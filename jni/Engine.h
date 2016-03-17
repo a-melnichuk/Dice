@@ -44,7 +44,7 @@ public:
     void resumeSensors();
 
     void setPickingRay(int32_t x, int32_t y);
-
+    bool mHasMotion;
 private:
     Dice mDice;
     Container mContainer;
