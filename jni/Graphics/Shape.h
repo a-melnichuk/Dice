@@ -24,6 +24,7 @@ class Shape
 {
 public:
 	Shape(){}
+	virtual ~Shape(){}
 	Shape(android_app* app);
 	virtual void setAssetManager(AAssetManager* assetManager);
 protected:
